@@ -71,13 +71,14 @@ export async function getCurrentUser(token: string) {
 }
 
 export async function logoutUser(token: string) {
-  const existingSession = await db.select().from(sessions).where(eq(sessions.token, token)).limit(1);
+  const deletedSession = await db
+    .delete(sessions)
+    .where(eq(sessions.token, token))
+    .returning();
 
-  if (existingSession.length === 0) {
+  if (deletedSession.length === 0) {
     return { error: "Unauthorized" };
   }
-
-  await db.delete(sessions).where(eq(sessions.token, token));
 
   return { success: true };
 }
