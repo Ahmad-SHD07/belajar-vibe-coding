@@ -69,3 +69,16 @@ export async function getCurrentUser(token: string) {
 
   return result[0];
 }
+
+export async function logoutUser(token: string) {
+  const deletedSession = await db
+    .delete(sessions)
+    .where(eq(sessions.token, token))
+    .returning();
+
+  if (deletedSession.length === 0) {
+    return { error: "Unauthorized" };
+  }
+
+  return { success: true };
+}
